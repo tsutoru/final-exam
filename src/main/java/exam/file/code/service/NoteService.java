@@ -29,11 +29,11 @@ public class NoteService {
   private final CourseTeamAssignmentRepository courseTeamAssignmentRepository;
 
   public NoteService(
-          NoteRepository noteRepository,
-          NoteHistoriqueRepository noteHistoriqueRepository,
-          ExamenRepository examenRepository,
-          StudentRepository studentRepository,
-          CourseTeamAssignmentRepository courseTeamAssignmentRepository) {
+      NoteRepository noteRepository,
+      NoteHistoriqueRepository noteHistoriqueRepository,
+      ExamenRepository examenRepository,
+      StudentRepository studentRepository,
+      CourseTeamAssignmentRepository courseTeamAssignmentRepository) {
     this.noteRepository = noteRepository;
     this.noteHistoriqueRepository = noteHistoriqueRepository;
     this.examenRepository = examenRepository;
@@ -56,16 +56,18 @@ public class NoteService {
 
   public NoteDto create(NoteCreateDto dto, String teacherId) {
     Examen examen =
-            examenRepository
-                    .findById(dto.examenId())
-                    .orElseThrow(() -> new NoSuchElementException("Examen introuvable : " + dto.examenId()));
+        examenRepository
+            .findById(dto.examenId())
+            .orElseThrow(
+                () -> new NoSuchElementException("Examen introuvable : " + dto.examenId()));
 
     verifyTeacherTeachesCours(teacherId, examen.getCours().getId());
 
     Student student =
-            studentRepository
-                    .findById(dto.studentId())
-                    .orElseThrow(() -> new NoSuchElementException("Étudiant introuvable : " + dto.studentId()));
+        studentRepository
+            .findById(dto.studentId())
+            .orElseThrow(
+                () -> new NoSuchElementException("Étudiant introuvable : " + dto.studentId()));
 
     Note note = new Note(null, student, examen, dto.valeur());
     return toDto(noteRepository.save(note));
@@ -78,9 +80,9 @@ public class NoteService {
     }
 
     Note note =
-            noteRepository
-                    .findById(noteId)
-                    .orElseThrow(() -> new NoSuchElementException("Note introuvable : " + noteId));
+        noteRepository
+            .findById(noteId)
+            .orElseThrow(() -> new NoSuchElementException("Note introuvable : " + noteId));
 
     verifyTeacherTeachesCours(teacherId, note.getExamen().getCours().getId());
 
@@ -98,8 +100,8 @@ public class NoteService {
 
   private void verifyTeacherTeachesCours(String teacherId, UUID coursId) {
     boolean enseigneCeCours =
-            courseTeamAssignmentRepository.findByCoursId(coursId).stream()
-                    .anyMatch(assignment -> assignment.getTeacher().getId().equals(teacherId));
+        courseTeamAssignmentRepository.findByCoursId(coursId).stream()
+            .anyMatch(assignment -> assignment.getTeacher().getId().equals(teacherId));
     if (!enseigneCeCours) {
       throw new AccessDeniedException("Cet enseignant ne donne pas ce cours.");
     }
@@ -107,6 +109,6 @@ public class NoteService {
 
   private NoteDto toDto(Note note) {
     return new NoteDto(
-            note.getId(), note.getStudent().getId(), note.getExamen().getId(), note.getValeur());
+        note.getId(), note.getStudent().getId(), note.getExamen().getId(), note.getValeur());
   }
 }

@@ -20,7 +20,6 @@ public class NoteController {
     this.noteService = noteService;
   }
 
-  
   @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
   @GetMapping("/me/notes")
   public List<NoteDto> findMyNotes(Authentication authentication) {
