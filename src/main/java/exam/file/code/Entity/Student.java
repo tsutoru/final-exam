@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("Student")
+@DiscriminatorValue("STUDENT")
 public class Student extends Users {
   private Set<Team> teams = new HashSet<>();
 }
