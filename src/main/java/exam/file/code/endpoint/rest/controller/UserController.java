@@ -15,18 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(
-            @RequestBody CreateUserRequest request
-    ) {
+  @PostMapping
+  public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest request) {
 
-        UserResponse response =
-                authService.createUser(request);
+    UserResponse response = authService.createUser(request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 }

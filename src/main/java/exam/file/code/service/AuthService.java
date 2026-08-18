@@ -79,7 +79,6 @@ public class AuthService {
     Users user;
 
     switch (request.getRole().toUpperCase()) {
-
       case "STUDENT":
         user = new Student();
         break;
@@ -93,24 +92,19 @@ public class AuthService {
         break;
 
       default:
-        throw new RuntimeException(
-                "Role invalide : STUDENT, TEACHER ou ADMIN"
-        );
+        throw new RuntimeException("Role invalide : STUDENT, TEACHER ou ADMIN");
     }
 
     user.setUsername(request.getUsername());
     user.setEmail(request.getEmail());
-    user.setPassword(
-            passwordEncoder.encode(request.getPassword())
-    );
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
 
     Users savedUser = usersRepository.save(user);
 
     return new UserResponse(
-            savedUser.getId(),
-            savedUser.getUsername(),
-            savedUser.getEmail(),
-            request.getRole().toUpperCase()
-    );
+        savedUser.getId(),
+        savedUser.getUsername(),
+        savedUser.getEmail(),
+        request.getRole().toUpperCase());
   }
 }
