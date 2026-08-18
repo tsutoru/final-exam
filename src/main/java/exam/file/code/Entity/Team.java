@@ -19,5 +19,6 @@ public class Team {
   @Id @GeneratedValue private UUID id;
   private String ref;
 
-  @OneToMany private Set<Student> studentSet = new HashSet<>();
+  @OneToMany(mappedBy = "team")
+  private Set<TeamMembership> memberships = new HashSet<>();
 }
