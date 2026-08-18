@@ -74,7 +74,6 @@ class NoteServiceTest {
     teacher.setId(teacherId);
   }
 
-
   @Test
   void create_should_save_note_when_teacher_teaches_the_course() {
     NoteCreateDto dto = new NoteCreateDto(studentId, examenId, new BigDecimal("14.5"));
@@ -133,8 +132,6 @@ class NoteServiceTest {
     assertThatThrownBy(() -> noteService.create(dto, teacherId))
         .isInstanceOf(NoSuchElementException.class);
   }
-
-
 
   @Test
   void update_should_throw_when_raison_is_blank() {
@@ -200,8 +197,6 @@ class NoteServiceTest {
                         && historique.getRaison().equals("Erreur de correction")
                         && historique.getModifiePar().equals(teacherId)));
   }
-
-
 
   @Test
   void findByStudent_should_return_only_that_student_notes() {

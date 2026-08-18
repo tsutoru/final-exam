@@ -41,15 +41,14 @@ class AuthServiceTest {
 
   @InjectMocks private AuthService authService;
 
-
-
   @Test
   void login_should_return_a_token_on_success() {
     LoginRequest request = new LoginRequest();
     request.setEmail("student@school.com");
     request.setPassword("password123");
 
-    UserDetails userDetails = User.withUsername("student@school.com").password("x").authorities("ROLE_STUDENT").build();
+    UserDetails userDetails =
+        User.withUsername("student@school.com").password("x").authorities("ROLE_STUDENT").build();
 
     when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
         .thenReturn(authentication);
@@ -60,8 +59,6 @@ class AuthServiceTest {
 
     assertThat(response.getToken()).isEqualTo("fake-jwt-token");
   }
-
-
 
   @Test
   void register_should_create_a_student_when_email_is_free() {
@@ -86,8 +83,7 @@ class AuthServiceTest {
     request.setEmail("existing@school.com");
     request.setRole("STUDENT");
 
-    when(usersRepository.findByEmail("existing@school.com"))
-        .thenReturn(Optional.of(new Student()));
+    when(usersRepository.findByEmail("existing@school.com")).thenReturn(Optional.of(new Student()));
 
     assertThatThrownBy(() -> authService.register(request)).isInstanceOf(RuntimeException.class);
 
@@ -119,8 +115,6 @@ class AuthServiceTest {
 
     assertThatThrownBy(() -> authService.register(request)).isInstanceOf(RuntimeException.class);
   }
-
-
 
   @Test
   void createUser_should_allow_creating_an_admin() {
