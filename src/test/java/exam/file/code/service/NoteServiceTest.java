@@ -65,7 +65,7 @@ class NoteServiceTest {
 
     cours = new Cours(coursId, "Base de données", 5, null, null);
 
-    examen = new Examen(examenId, "Partiel 1", null, cours);
+    examen = new Examen(examenId, "Partiel 1", null, BigDecimal.valueOf(0.25), cours);
 
     student = new Student();
     student.setId(studentId);
