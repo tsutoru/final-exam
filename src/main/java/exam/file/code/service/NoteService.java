@@ -69,7 +69,7 @@ public class NoteService {
             .orElseThrow(
                 () -> new NoSuchElementException("Étudiant introuvable : " + dto.studentId()));
 
-    Note note = new Note(null, student, examen, dto.valeur());
+    Note note = new Note(null, student, examen, dto.valeur(), dto.anneeEtude());
     return toDto(noteRepository.save(note));
   }
 
