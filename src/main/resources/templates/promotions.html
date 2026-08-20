@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Promotions</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .promotion {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .promotion h2 {
+            margin-top: 0;
+        }
+
+        .download-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .download-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .empty {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Liste des promotions</h1>
+
+<div th:if="${#lists.isEmpty(promotions)}">
+    <p class="empty">Aucune promotion disponible.</p>
+</div>
+
+<div
+        class="promotion"
+        th:each="promotion : ${promotions}"
+>
+
+    <strong id="currentYear"></strong>
+
+    <script>
+        document.getElementById("currentYear").textContent =
+            new Date().getFullYear();
+    </script>
+
+    <p>
+        Année d'entrée :
+        <strong th:text="${promotion.anneeEntree}">
+            2026
+        </strong>
+    </p>
+
+    <a
+            class="download-button"
+            th:href="@{/promotions/{id}/diplomes(id=${promotion.id})}"
+    >
+        Télécharger la liste des diplômés
+    </a>
+
+</div>
+
+</body>
+</html>

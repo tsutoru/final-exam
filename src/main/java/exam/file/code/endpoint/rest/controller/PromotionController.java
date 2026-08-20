@@ -31,14 +31,11 @@ public class PromotionController {
     return promotionService.create(dto);
   }
 
-  // Tous les étudiants de la promotion avec leur moyenne générale sur 3 ans
-  // et leur statut diplômé ou non.
   @GetMapping("/{id}/resultats")
   public List<MoyenneDto> resultats(@PathVariable UUID id) {
     return promotionService.listeResultatsPromotion(id);
   }
 
-  // Uniquement les diplômés — utilisé ensuite par l'export Excel.
   @GetMapping("/{id}/diplomes")
   public List<MoyenneDto> diplomes(@PathVariable UUID id) {
     return promotionService.listeDiplomes(id);
