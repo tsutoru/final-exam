@@ -76,7 +76,7 @@ class NoteServiceTest {
 
   @Test
   void create_should_save_note_when_teacher_teaches_the_course() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, new BigDecimal("14.5"));
+    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, new BigDecimal("14.5"), 1);
 
     when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
     when(courseTeamAssignmentRepository.findByCoursId(coursId))
@@ -100,7 +100,7 @@ class NoteServiceTest {
 
   @Test
   void create_should_throw_when_examen_does_not_exist() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
+    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN, 1);
     when(examenRepository.findById(examenId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> noteService.create(dto, teacherId))
@@ -111,7 +111,7 @@ class NoteServiceTest {
 
   @Test
   void create_should_throw_when_teacher_does_not_teach_the_course() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
+    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN, 1);
     when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
     when(courseTeamAssignmentRepository.findByCoursId(coursId)).thenReturn(List.of());
 
@@ -123,7 +123,7 @@ class NoteServiceTest {
 
   @Test
   void create_should_throw_when_student_does_not_exist() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
+    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN, 1);
     when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
     when(courseTeamAssignmentRepository.findByCoursId(coursId))
         .thenReturn(List.of(assignmentFor(teacher)));
@@ -163,7 +163,7 @@ class NoteServiceTest {
 
   @Test
   void update_should_throw_when_teacher_does_not_teach_the_course() {
-    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"));
+    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"), 1);
     NoteUpdateDto dto = new NoteUpdateDto(BigDecimal.TEN, "Réclamation étudiant");
 
     when(noteRepository.findById(noteId)).thenReturn(Optional.of(existingNote));
@@ -177,7 +177,7 @@ class NoteServiceTest {
 
   @Test
   void update_should_record_history_and_change_value_when_authorized() {
-    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"));
+    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"), 1);
     NoteUpdateDto dto = new NoteUpdateDto(new BigDecimal("12"), "Erreur de correction");
 
     when(noteRepository.findById(noteId)).thenReturn(Optional.of(existingNote));
@@ -200,7 +200,7 @@ class NoteServiceTest {
 
   @Test
   void findByStudent_should_return_only_that_student_notes() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("15"));
+    Note note = new Note(noteId, student, examen, new BigDecimal("15"), 1);
     when(noteRepository.findByStudentId(studentId)).thenReturn(List.of(note));
 
     List<NoteDto> result = noteService.findByStudent(studentId);
@@ -221,7 +221,7 @@ class NoteServiceTest {
 
   @Test
   void findByCoursForTeacher_should_return_notes_when_authorized() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("9"));
+    Note note = new Note(noteId, student, examen, new BigDecimal("9"), 1);
     when(courseTeamAssignmentRepository.findByCoursId(coursId))
         .thenReturn(List.of(assignmentFor(teacher)));
     when(noteRepository.findByExamenCoursId(coursId)).thenReturn(List.of(note));
@@ -233,7 +233,7 @@ class NoteServiceTest {
 
   @Test
   void findByCoursForAdmin_should_return_notes_without_any_check() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("11"));
+    Note note = new Note(noteId, student, examen, new BigDecimal("11"), 1);
     when(noteRepository.findByExamenCoursId(coursId)).thenReturn(List.of(note));
 
     List<NoteDto> result = noteService.findByCoursForAdmin(coursId);
@@ -242,6 +242,6 @@ class NoteServiceTest {
   }
 
   private CourseTeamAssignment assignmentFor(Teacher teacher) {
-    return new CourseTeamAssignment(UUID.randomUUID(), cours, teacher, null);
+    return new CourseTeamAssignment(UUID.randomUUID(), cours, teacher, null, 1);
   }
 }
