@@ -16,7 +16,8 @@ public class Student extends Users {
   @OneToMany(mappedBy = "student")
   private Set<TeamMembership> teamHistory = new HashSet<>();
 
-  @Getter @Setter
+  @Getter
+  @Setter
   @ManyToOne
   @JoinColumn(name = "promotion_id")
   private Promotion promotion;
