@@ -31,12 +31,10 @@ public class PromotionController {
     return promotionService.create(dto);
   }
 
-
   @GetMapping("/{id}/resultats")
   public List<MoyenneDto> resultats(@PathVariable UUID id) {
     return promotionService.listeResultatsPromotion(id);
   }
-
 
   @GetMapping("/{id}/diplomes")
   public List<MoyenneDto> diplomes(@PathVariable UUID id) {
