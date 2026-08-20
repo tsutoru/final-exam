@@ -24,14 +24,15 @@ class PdfServiceTest {
     student.setUsername("Jean Dupont");
 
     Cours cours = new Cours(UUID.randomUUID(), "Base de données", 5, null, null);
-    Examen examen = new Examen(UUID.randomUUID(), "Partiel 1", null, BigDecimal.valueOf(0.25), cours);
+    Examen examen =
+        new Examen(UUID.randomUUID(), "Partiel 1", null, BigDecimal.valueOf(0.25), cours);
     Note note = new Note(UUID.randomUUID(), student, examen, new BigDecimal("14.5"), 1);
 
     File pdf = pdfService.generateReleveDeNotes(student, List.of(note));
 
     assertThat(pdf).exists();
     assertThat(pdf.length()).isGreaterThan(0);
-    
+
     byte[] header = new byte[4];
     Files.newInputStream(pdf.toPath()).read(header);
     assertThat(new String(header)).isEqualTo("%PDF");

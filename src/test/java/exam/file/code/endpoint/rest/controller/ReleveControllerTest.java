@@ -20,13 +20,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 @WebMvcTest(
-        controllers = ReleveController.class,
-        excludeFilters =
+    controllers = ReleveController.class,
+    excludeFilters =
         @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = JwtAuthenticationFilter.class))
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = JwtAuthenticationFilter.class))
 @Import(ReleveControllerTest.MethodSecurityTestConfig.class)
 class ReleveControllerTest {
 
@@ -42,8 +41,8 @@ class ReleveControllerTest {
   @WithMockUser(username = "student-1", roles = "STUDENT")
   void demanderMonReleve_should_return_202_for_the_connected_student() throws Exception {
     mockMvc
-            .perform(post("/me/releve").param("email", "jean@school.com").with(csrf()))
-            .andExpect(status().isAccepted());
+        .perform(post("/me/releve").param("email", "jean@school.com").with(csrf()))
+        .andExpect(status().isAccepted());
 
     verify(eventProducer).accept(any());
   }
@@ -51,17 +50,17 @@ class ReleveControllerTest {
   @Test
   void demanderMonReleve_should_be_rejected_when_not_authenticated() throws Exception {
     mockMvc
-            .perform(post("/me/releve").param("email", "jean@school.com").with(csrf()))
-            .andExpect(status().is4xxClientError());
+        .perform(post("/me/releve").param("email", "jean@school.com").with(csrf()))
+        .andExpect(status().is4xxClientError());
   }
 
   @Test
   @WithMockUser(roles = "ADMIN")
   void envoyerReleve_should_return_202_for_an_admin() throws Exception {
     mockMvc
-            .perform(
-                    post("/admin/students/student-2/releve").param("email", "x@school.com").with(csrf()))
-            .andExpect(status().isAccepted());
+        .perform(
+            post("/admin/students/student-2/releve").param("email", "x@school.com").with(csrf()))
+        .andExpect(status().isAccepted());
 
     verify(eventProducer).accept(any());
   }
@@ -70,13 +69,13 @@ class ReleveControllerTest {
   @WithMockUser(roles = "STUDENT")
   void envoyerReleve_should_be_forbidden_for_a_student() throws Exception {
     mockMvc
-            .perform(
-                    post("/admin/students/student-2/releve").param("email", "x@school.com").with(csrf()))
-            .andExpect(status().isForbidden());
+        .perform(
+            post("/admin/students/student-2/releve").param("email", "x@school.com").with(csrf()))
+        .andExpect(status().isForbidden());
   }
 
   private static org.springframework.test.web.servlet.request.RequestPostProcessor csrf() {
     return org.springframework.security.test.web.servlet.request
-            .SecurityMockMvcRequestPostProcessors.csrf();
+        .SecurityMockMvcRequestPostProcessors.csrf();
   }
 }
