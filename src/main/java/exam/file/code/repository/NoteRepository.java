@@ -10,4 +10,6 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
   List<Note> findByStudentId(String studentId);
 
   List<Note> findByExamenCoursId(UUID coursId);
+
+  List<Note> findByStudentIdAndAnneeEtude(String studentId, int anneeEtude);
 }
