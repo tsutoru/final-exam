@@ -11,6 +11,7 @@ import exam.file.code.Entity.Cours;
 import exam.file.code.Entity.CourseTeamAssignment;
 import exam.file.code.Entity.Examen;
 import exam.file.code.Entity.Note;
+import exam.file.code.Entity.NoteHistorique;
 import exam.file.code.Entity.Student;
 import exam.file.code.Entity.Teacher;
 import exam.file.code.dto.NoteCreateDto;
@@ -50,6 +51,7 @@ class NoteServiceTest {
   private UUID noteId;
   private String studentId;
   private String teacherId;
+
   private Cours cours;
   private Examen examen;
   private Student student;
@@ -60,12 +62,25 @@ class NoteServiceTest {
     coursId = UUID.randomUUID();
     examenId = UUID.randomUUID();
     noteId = UUID.randomUUID();
+
     studentId = "student-1";
     teacherId = "teacher-1";
 
-    cours = new Cours(coursId, "Base de données", 5, null, null);
+    cours = new Cours(
+            coursId,
+            "Base de données",
+            5,
+            null,
+            null
+    );
 
-    examen = new Examen(examenId, "Partiel 1", null, BigDecimal.valueOf(0.25), cours);
+    examen = new Examen(
+            examenId,
+            "Partiel 1",
+            null,
+            BigDecimal.valueOf(0.25),
+            cours
+    );
 
     student = new Student();
     student.setId(studentId);
@@ -76,19 +91,31 @@ class NoteServiceTest {
 
   @Test
   void create_should_save_note_when_teacher_teaches_the_course() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, new BigDecimal("14.5"));
 
-    when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
+    NoteCreateDto dto =
+            new NoteCreateDto(
+                    studentId,
+                    examenId,
+                    new BigDecimal("14.5"),
+                    1
+            );
+
+    when(examenRepository.findById(examenId))
+            .thenReturn(Optional.of(examen));
+
     when(courseTeamAssignmentRepository.findByCoursId(coursId))
-        .thenReturn(List.of(assignmentFor(teacher)));
-    when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
+            .thenReturn(List.of(assignmentFor(teacher)));
+
+    when(studentRepository.findById(studentId))
+            .thenReturn(Optional.of(student));
+
     when(noteRepository.save(any(Note.class)))
-        .thenAnswer(
-            invocation -> {
-              Note note = invocation.getArgument(0);
-              note.setId(noteId);
-              return note;
-            });
+            .thenAnswer(
+                    invocation -> {
+                      Note note = invocation.getArgument(0);
+                      note.setId(noteId);
+                      return note;
+                    });
 
     NoteDto result = noteService.create(dto, teacherId);
 
@@ -100,148 +127,312 @@ class NoteServiceTest {
 
   @Test
   void create_should_throw_when_examen_does_not_exist() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
-    when(examenRepository.findById(examenId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> noteService.create(dto, teacherId))
-        .isInstanceOf(NoSuchElementException.class);
+    NoteCreateDto dto =
+            new NoteCreateDto(
+                    studentId,
+                    examenId,
+                    BigDecimal.TEN,
+                    1
+            );
+
+    when(examenRepository.findById(examenId))
+            .thenReturn(Optional.empty());
+
+    assertThatThrownBy(
+            () -> noteService.create(dto, teacherId)
+    )
+            .isInstanceOf(NoSuchElementException.class);
 
     verify(noteRepository, never()).save(any());
   }
 
   @Test
   void create_should_throw_when_teacher_does_not_teach_the_course() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
-    when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
-    when(courseTeamAssignmentRepository.findByCoursId(coursId)).thenReturn(List.of());
 
-    assertThatThrownBy(() -> noteService.create(dto, teacherId))
-        .isInstanceOf(AccessDeniedException.class);
+    NoteCreateDto dto =
+            new NoteCreateDto(
+                    studentId,
+                    examenId,
+                    BigDecimal.TEN,
+                    1
+            );
+
+    when(examenRepository.findById(examenId))
+            .thenReturn(Optional.of(examen));
+
+    when(courseTeamAssignmentRepository.findByCoursId(coursId))
+            .thenReturn(List.of());
+
+    assertThatThrownBy(
+            () -> noteService.create(dto, teacherId)
+    )
+            .isInstanceOf(AccessDeniedException.class);
 
     verify(noteRepository, never()).save(any());
   }
 
   @Test
   void create_should_throw_when_student_does_not_exist() {
-    NoteCreateDto dto = new NoteCreateDto(studentId, examenId, BigDecimal.TEN);
-    when(examenRepository.findById(examenId)).thenReturn(Optional.of(examen));
-    when(courseTeamAssignmentRepository.findByCoursId(coursId))
-        .thenReturn(List.of(assignmentFor(teacher)));
-    when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> noteService.create(dto, teacherId))
-        .isInstanceOf(NoSuchElementException.class);
+    NoteCreateDto dto =
+            new NoteCreateDto(
+                    studentId,
+                    examenId,
+                    BigDecimal.TEN,
+                    1
+            );
+
+    when(examenRepository.findById(examenId))
+            .thenReturn(Optional.of(examen));
+
+    when(courseTeamAssignmentRepository.findByCoursId(coursId))
+            .thenReturn(List.of(assignmentFor(teacher)));
+
+    when(studentRepository.findById(studentId))
+            .thenReturn(Optional.empty());
+
+    assertThatThrownBy(
+            () -> noteService.create(dto, teacherId)
+    )
+            .isInstanceOf(NoSuchElementException.class);
   }
 
   @Test
   void update_should_throw_when_raison_is_blank() {
-    NoteUpdateDto dto = new NoteUpdateDto(BigDecimal.TEN, "   ");
 
-    assertThatThrownBy(() -> noteService.update(noteId, dto, teacherId))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("raison");
+    NoteUpdateDto dto =
+            new NoteUpdateDto(
+                    BigDecimal.TEN,
+                    "   "
+            );
+
+    assertThatThrownBy(
+            () -> noteService.update(noteId, dto, teacherId)
+    )
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("raison");
 
     verify(noteRepository, never()).findById(any());
   }
 
   @Test
   void update_should_throw_when_raison_is_null() {
-    NoteUpdateDto dto = new NoteUpdateDto(BigDecimal.TEN, null);
 
-    assertThatThrownBy(() -> noteService.update(noteId, dto, teacherId))
-        .isInstanceOf(IllegalArgumentException.class);
+    NoteUpdateDto dto =
+            new NoteUpdateDto(
+                    BigDecimal.TEN,
+                    null
+            );
+
+    assertThatThrownBy(
+            () -> noteService.update(noteId, dto, teacherId)
+    )
+            .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void update_should_throw_when_note_does_not_exist() {
-    NoteUpdateDto dto = new NoteUpdateDto(BigDecimal.TEN, "Erreur de saisie");
-    when(noteRepository.findById(noteId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> noteService.update(noteId, dto, teacherId))
-        .isInstanceOf(NoSuchElementException.class);
+    NoteUpdateDto dto =
+            new NoteUpdateDto(
+                    BigDecimal.TEN,
+                    "Erreur de saisie"
+            );
+
+    when(noteRepository.findById(noteId))
+            .thenReturn(Optional.empty());
+
+    assertThatThrownBy(
+            () -> noteService.update(noteId, dto, teacherId)
+    )
+            .isInstanceOf(NoSuchElementException.class);
   }
 
   @Test
   void update_should_throw_when_teacher_does_not_teach_the_course() {
-    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"));
-    NoteUpdateDto dto = new NoteUpdateDto(BigDecimal.TEN, "Réclamation étudiant");
 
-    when(noteRepository.findById(noteId)).thenReturn(Optional.of(existingNote));
-    when(courseTeamAssignmentRepository.findByCoursId(coursId)).thenReturn(List.of());
+    Note existingNote =
+            new Note(
+                    noteId,
+                    student,
+                    examen,
+                    new BigDecimal("8"),
+                    1
+            );
 
-    assertThatThrownBy(() -> noteService.update(noteId, dto, teacherId))
-        .isInstanceOf(AccessDeniedException.class);
+    NoteUpdateDto dto =
+            new NoteUpdateDto(
+                    BigDecimal.TEN,
+                    "Réclamation étudiant"
+            );
+
+    when(noteRepository.findById(noteId))
+            .thenReturn(Optional.of(existingNote));
+
+    when(courseTeamAssignmentRepository.findByCoursId(coursId))
+            .thenReturn(List.of());
+
+    assertThatThrownBy(
+            () -> noteService.update(noteId, dto, teacherId)
+    )
+            .isInstanceOf(AccessDeniedException.class);
 
     verify(noteHistoriqueRepository, never()).save(any());
   }
 
   @Test
   void update_should_record_history_and_change_value_when_authorized() {
-    Note existingNote = new Note(noteId, student, examen, new BigDecimal("8"));
-    NoteUpdateDto dto = new NoteUpdateDto(new BigDecimal("12"), "Erreur de correction");
 
-    when(noteRepository.findById(noteId)).thenReturn(Optional.of(existingNote));
+    Note existingNote =
+            new Note(
+                    noteId,
+                    student,
+                    examen,
+                    new BigDecimal("8"),
+                    1
+            );
+
+    NoteUpdateDto dto =
+            new NoteUpdateDto(
+                    new BigDecimal("12"),
+                    "Erreur de correction"
+            );
+
+    when(noteRepository.findById(noteId))
+            .thenReturn(Optional.of(existingNote));
+
     when(courseTeamAssignmentRepository.findByCoursId(coursId))
-        .thenReturn(List.of(assignmentFor(teacher)));
-    when(noteRepository.save(any(Note.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            .thenReturn(List.of(assignmentFor(teacher)));
 
-    NoteDto result = noteService.update(noteId, dto, teacherId);
+    when(noteRepository.save(any(Note.class)))
+            .thenAnswer(
+                    invocation -> invocation.getArgument(0)
+            );
 
-    assertThat(result.valeur()).isEqualByComparingTo("12");
+    NoteDto result =
+            noteService.update(
+                    noteId,
+                    dto,
+                    teacherId
+            );
+
+    assertThat(result.valeur())
+            .isEqualByComparingTo("12");
+
     verify(noteHistoriqueRepository)
-        .save(
-            org.mockito.ArgumentMatchers.argThat(
-                historique ->
-                    historique.getAncienneValeur().compareTo(new BigDecimal("8")) == 0
-                        && historique.getNouvelleValeur().compareTo(new BigDecimal("12")) == 0
-                        && historique.getRaison().equals("Erreur de correction")
-                        && historique.getModifiePar().equals(teacherId)));
+            .save(
+                    org.mockito.ArgumentMatchers.argThat(
+                            historique ->
+                                    historique.getAncienneValeur()
+                                            .compareTo(new BigDecimal("8")) == 0
+                                            && historique.getNouvelleValeur()
+                                            .compareTo(new BigDecimal("12")) == 0
+                                            && historique.getRaison()
+                                            .equals("Erreur de correction")
+                                            && historique.getModifiePar()
+                                            .equals(teacherId)
+                    )
+            );
   }
 
   @Test
   void findByStudent_should_return_only_that_student_notes() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("15"));
-    when(noteRepository.findByStudentId(studentId)).thenReturn(List.of(note));
 
-    List<NoteDto> result = noteService.findByStudent(studentId);
+    Note note =
+            new Note(
+                    noteId,
+                    student,
+                    examen,
+                    new BigDecimal("15"),
+                    1
+            );
+
+    when(noteRepository.findByStudentId(studentId))
+            .thenReturn(List.of(note));
+
+    List<NoteDto> result =
+            noteService.findByStudent(studentId);
 
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).studentId()).isEqualTo(studentId);
+    assertThat(result.get(0).studentId())
+            .isEqualTo(studentId);
   }
 
   @Test
   void findByCoursForTeacher_should_throw_when_teacher_does_not_teach_the_course() {
-    when(courseTeamAssignmentRepository.findByCoursId(coursId)).thenReturn(List.of());
 
-    assertThatThrownBy(() -> noteService.findByCoursForTeacher(coursId, teacherId))
-        .isInstanceOf(AccessDeniedException.class);
+    when(courseTeamAssignmentRepository.findByCoursId(coursId))
+            .thenReturn(List.of());
 
-    verify(noteRepository, never()).findByExamenCoursId(any());
+    assertThatThrownBy(
+            () ->
+                    noteService.findByCoursForTeacher(
+                            coursId,
+                            teacherId
+                    )
+    )
+            .isInstanceOf(AccessDeniedException.class);
+
+    verify(noteRepository, never())
+            .findByExamenCoursId(any());
   }
 
   @Test
   void findByCoursForTeacher_should_return_notes_when_authorized() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("9"));
-    when(courseTeamAssignmentRepository.findByCoursId(coursId))
-        .thenReturn(List.of(assignmentFor(teacher)));
-    when(noteRepository.findByExamenCoursId(coursId)).thenReturn(List.of(note));
 
-    List<NoteDto> result = noteService.findByCoursForTeacher(coursId, teacherId);
+    Note note =
+            new Note(
+                    noteId,
+                    student,
+                    examen,
+                    new BigDecimal("9"),
+                    1
+            );
+
+    when(courseTeamAssignmentRepository.findByCoursId(coursId))
+            .thenReturn(List.of(assignmentFor(teacher)));
+
+    when(noteRepository.findByExamenCoursId(coursId))
+            .thenReturn(List.of(note));
+
+    List<NoteDto> result =
+            noteService.findByCoursForTeacher(
+                    coursId,
+                    teacherId
+            );
 
     assertThat(result).hasSize(1);
   }
 
   @Test
   void findByCoursForAdmin_should_return_notes_without_any_check() {
-    Note note = new Note(noteId, student, examen, new BigDecimal("11"));
-    when(noteRepository.findByExamenCoursId(coursId)).thenReturn(List.of(note));
 
-    List<NoteDto> result = noteService.findByCoursForAdmin(coursId);
+    Note note =
+            new Note(
+                    noteId,
+                    student,
+                    examen,
+                    new BigDecimal("11"),
+                    1
+            );
+
+    when(noteRepository.findByExamenCoursId(coursId))
+            .thenReturn(List.of(note));
+
+    List<NoteDto> result =
+            noteService.findByCoursForAdmin(coursId);
 
     assertThat(result).hasSize(1);
   }
 
   private CourseTeamAssignment assignmentFor(Teacher teacher) {
-    return new CourseTeamAssignment(UUID.randomUUID(), cours, teacher, null);
+    return new CourseTeamAssignment(
+            UUID.randomUUID(),
+            cours,
+            teacher,
+            null,
+            1
+    );
   }
 }

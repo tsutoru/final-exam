@@ -29,7 +29,6 @@ public class CourseTeamAssignment {
   @JoinColumn(name = "teacher_id")
   private Teacher teacher;
 
-  // Nullable volontairement : null = cours commun à toute la promotion de cette année.
   @ManyToOne(optional = true)
   @JoinColumn(name = "team_id")
   private Team team;
