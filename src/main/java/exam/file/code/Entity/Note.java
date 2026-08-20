@@ -28,4 +28,10 @@ public class Note {
 
   @Column(nullable = false)
   private BigDecimal valeur;
+
+  // Année du parcours au moment de la note : 1, 2 ou 3.
+  // Dénormalisé volontairement pour simplifier les calculs de moyenne
+  // annuelle / sur 3 ans sans jointures complexes via Team/TeamMembership.
+  @Column(nullable = false)
+  private int anneeEtude;
 }
