@@ -7,10 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// Représente : "ce prof donne ce cours, à cette année du parcours (1/2/3), à ce groupe".
+// team = null signifie que le cours est COMMUN : toute la promotion de cette année-là
+// le suit, sans distinction EL/TN (cas systématique en L1, possible aussi en L2/L3
+// pour les matières partagées entre les deux parcours).
 @Entity
-@Table(
-    name = "course_team_assignment",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"cours_id", "teacher_id", "team_id"}))
+@Table(name = "course_team_assignment")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,7 +29,11 @@ public class CourseTeamAssignment {
   @JoinColumn(name = "teacher_id")
   private Teacher teacher;
 
-  @ManyToOne(optional = false)
+  // Nullable volontairement : null = cours commun à toute la promotion de cette année.
+  @ManyToOne(optional = true)
   @JoinColumn(name = "team_id")
   private Team team;
+
+  @Column(nullable = false)
+  private int anneeEtude;
 }
